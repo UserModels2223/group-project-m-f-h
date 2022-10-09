@@ -1,6 +1,6 @@
 ---
 API: 2.1
-OpenSesame: 3.3.12
+OpenSesame: 3.3.12b1
 Platform: posix
 ---
 set width 1024
@@ -26,7 +26,7 @@ set font_size 30
 set font_italic no
 set font_family mono
 set font_bold no
-set experiment_path "/Users/joostfranssen/Downloads"
+set experiment_path "/home/a-j/Documents/group-project-m-f-h"
 set disable_garbage_collection yes
 set description "The main experiment item"
 set coordinates uniform
@@ -90,8 +90,7 @@ define inline_script present_trial
 	
 		
 	#If a fact is new, give it a fifty fifty chance to be presented as audio visual
-	#TODO update this chance based on performance on fact presentation type
-	if new and rand.uniform(0, 1) <= 0.50:
+	if new and rand.uniform(0, 1) <= audio_visual_chance:
 		my_canvas.text(answer, y = 50, font_size = 20)
 		my_sampler = Sampler(links_audio[fact_id])
 		audio_visual_facts.append(fact_id)
@@ -148,14 +147,25 @@ define inline_script present_trial
 	
 	
 	#Save the number of correct and incorrect answer per category
+	#Also update the fact presentation chance
 	if fact_id in audio_visual_facts:
 		if correct:
 			correct_audio_visual += 1
+			if audio_visual_chance < 0.50:
+				audio_visual_chance += 0.05
+			else:
+				audio_visual_chance += audio_visual_chance * 0.1
+			visual_chance = 1.0 - audio_visual_chance
 		else:
 			wrong_audio_visual += 1
 	else:
 		if correct:
 			correct_visual += 1
+			if visual_chance < 0.50:
+				visual_chance += 0.05
+			else:
+				visual_chance += visual_chance * 0.1
+			audio_visual_chance = 1.0 - visual_chance
 		else:
 			wrong_visual += 1
 	
@@ -196,6 +206,7 @@ define inline_script present_trial
 	print("wrong audio visual: " + str(wrong_audio_visual))
 	print("correct visual: " + str(correct_visual))
 	print("wrong visual: " + str(wrong_visual))
+	print("Audio_visual_chance: " + str(audio_visual_chance))
 	print(" ")
 	__end__
 	set _prepare ""
@@ -220,6 +231,8 @@ define inline_script slimstampen_setup
 	wrong_audio_visual = 0
 	correct_visual = 0
 	wrong_visual = 0
+	audio_visual_chance = 0.50
+	visual_chance = 0.50
 	
 	
 	links_audio= dict({1: 'audio_files/car.wav',
