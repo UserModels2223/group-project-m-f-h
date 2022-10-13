@@ -83,11 +83,14 @@ define inline_script present_trial
 	
 	#Als we weten welke fact welke id heeft kunnen we hier het afspelen op baseren, met dictionary ofzo
 	fact_id = next_fact.fact_id
-	
+	print(stopwatch.process_time())
 	# Show prompt, if the fact has been presented as an audio_visual_fact before, also play the audio file
 	my_canvas = Canvas()
 	my_canvas.text(prompt, font_size = 30)
-	
+	if fact_id in audio_visual_facts:
+		my_sampler = Sampler(links_audio[fact_id])
+		audio_visual_facts.append(fact_id)
+		my_sampler.play()
 		
 	#If a fact is new, give it a fifty fifty chance to be presented as audio visual
 	if new and rand.uniform(0, 1) <= audio_visual_chance:
@@ -143,30 +146,35 @@ define inline_script present_trial
 		
 	
 	# Check if the response is correct
+	# If the answer is correct, increment how often the fact has been entered correctly
 	correct = keyboard_response == answer
+	if correct and not new:
+		fact_correctness[fact_id] += 1
+	elif not new:
+		fact_correctness[fact_id] = 0
 	
 	
 	#Save the number of correct and incorrect answer per category
 	#Also update the fact presentation chance
-	if fact_id in audio_visual_facts:
-		if correct:
+	if not new and fact_id in audio_visual_facts:
+		if correct and fact_correctness[fact_id] >= times_correct:
 			correct_audio_visual += 1
-			if audio_visual_chance < 0.50:
+			if stopwatch.process_time() >= update_formula_time and audio_visual_chance < 0.50:
 				audio_visual_chance += 0.05
-			else:
+			elif stopwatch.process_time() >= update_formula_time:
 				audio_visual_chance += audio_visual_chance * 0.1
 			visual_chance = 1.0 - audio_visual_chance
-		else:
+		elif not correct:
 			wrong_audio_visual += 1
-	else:
-		if correct:
+	elif not new:
+		if correct and fact_correctness[fact_id] >= times_correct:
 			correct_visual += 1
-			if visual_chance < 0.50:
+			if stopwatch.process_time() >= update_formula_time and visual_chance < 0.50:
 				visual_chance += 0.05
-			else:
+			elif stopwatch.process_time() >= update_formula_time:
 				visual_chance += visual_chance * 0.1
 			audio_visual_chance = 1.0 - visual_chance
-		else:
+		elif not correct:
 			wrong_visual += 1
 	
 	# Log response
@@ -224,7 +232,8 @@ define inline_script slimstampen_setup
 	set description ""
 	___run__
 	import random as rand
-	
+	import time as stopwatch
+	import numpy as np
 	m = SpacingModel()
 	
 	correct_audio_visual = 0
@@ -233,9 +242,14 @@ define inline_script slimstampen_setup
 	wrong_visual = 0
 	audio_visual_chance = 0.50
 	visual_chance = 0.50
+	#Time in seconds that need to have passed from start of experiment for the formula to kick in
+	update_formula_time = 120
+	#How often a fact has to been answered correctly consecutively to be considdered "learnt"
+	times_correct = 3
+	amount_of_facts = 53
+	fact_correctness = np.zeros(amount_of_facts)
 	
-	
-	links_audio= dict({1: 'audio_files/car.wav',
+	links_audio = dict({1: 'audio_files/car.wav',
 						2: 'audio_files/visit.wav', 
 						3: 'audio_files/bread.wav',
 						4: 'audio_files/blood.wav',
