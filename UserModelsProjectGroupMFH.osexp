@@ -48,7 +48,7 @@ define sequence experiment
 define sketchpad instructions
 	set duration keypress
 	set description "Displays stimuli"
-	draw textline center=1 color=black font_bold=no font_family=mono font_italic=no font_size=25 html=yes show_if=always text="Welcome (Instructions can be placed here). Press any key to begin." x=0 y=0 z_index=0
+	draw textline center=1 color=black font_bold=no font_family=mono font_italic=no font_size=25 html=yes show_if=always text="During experiment you will be learning the English translation of various Portuguese words. <br /><br />The first time a Portuguese word is presented it will be accompanied with its English translation. <br /><br />You can type the word and press the 'Enter' key to submit a response. There is no need to click anywhere, you can start typing automatically.<br /><br />The Portuguese words will either be presented as plain text, or as text with an corresponding audio file of a voice pronouncing said word.<br /><br />Press any key to begin the experiment." x=0 y=0 z_index=0
 
 define inline_script learning_session_setup
 	set description "Executes Python code"
@@ -63,7 +63,7 @@ define inline_script learning_session_setup
 	var.trial_num = 1
 	
 	# Settings
-	var.session_duration = 10000000
+	var.session_duration = 600000
 	var.feedback_duration = 800
 	var.inter_trial_interval = 200
 	__end__
@@ -76,10 +76,10 @@ define inline_script present_trial
 	
 	
 	# Get next fact from the model
-	# Ik denk dat we hier een soort van audio koppel moeten maken naar het fact bestand
+	# Order swapped due to incorrect dictionary structure
 	next_fact, new = m.get_next_fact(current_time = trial_start_time)
-	prompt = next_fact.question
-	answer = next_fact.answer
+	answer = next_fact.question
+	prompt = next_fact.answer
 	
 	#Als we weten welke fact welke id heeft kunnen we hier het afspelen op baseren, met dictionary ofzo
 	fact_id = next_fact.fact_id
@@ -260,47 +260,47 @@ define inline_script slimstampen_setup
 						9: 'audio_files/employee.wav',
 						10: 'audio_files/virus.wav',
 						11: 'audio_files/dinner.wav',
-						12: 'audio_files/investment.wav'
-						13: 'audio_files/yes.wav'
-						14: 'audio_files/thank you.wav'
-						15: 'audio_files/goodbye.wav'
-						16: 'audio_files/smile.wav'
-						17: 'audio_files/today.wav'
-						18: 'audio_files/airport.wav'
-						19: 'audio_files/hi.wav'
-						20: 'audio_files/nice to meet you.wav'
-						21: "audio_files/you're welcome.wav"
-						22: 'audio_files/how are you.wav'
-						23: 'audio_files/week.wav'
-						24: 'audio_files/year.wav'
-						25: 'audio_files/yesterday.wav'
-						26: 'audio_files/tomorrow.wav'
-						27: 'audio_files/can.wav'
-						28: 'audio_files/use.wav'
-						29: 'audio_files/do.wav'
-						30: 'audio_files/far.wav'
-						31: 'audio_files/small.wav'
-						32: 'audio_files/good.wav'
-						33: 'audio_files/beautiful.wav'
-						34: 'audio_files/ugly.wav'
-						35: 'audio_files/difficult.wav'
-						36: 'audio_files/bad.wav'
-						37: 'audio_files/near.wav'
-						38: 'audio_files/beer.wav'
-						39: 'audio_files/wine.wav'
-						40: 'audio_files/chicken.wav'
-						41: 'audio_files/fish.wav'
-						42: 'audio_files/cook.wav'
-						43: 'audio_files/engineer.wav'
-						44: 'audio_files/doctor.wav'
-						45: 'audio_files/nurse.wav'
-						46: 'audio_files/teacher.wav'
-						47: 'audio_files/programmer.wav'
-						48: 'audio_files/salesman.wav'
-						49: 'audio_files/good morning.wav'
-						50: 'audio_files/good afternoon.wav'
-						51: 'audio_files/good evening.wav'
-						52: 'audio_files/good night.wav'
+						12: 'audio_files/investment.wav',
+						13: 'audio_files/yes.wav',
+						14: 'audio_files/thank you.wav',
+						15: 'audio_files/goodbye.wav',
+						16: 'audio_files/smile.wav',
+						17: 'audio_files/today.wav',
+						18: 'audio_files/airport.wav',
+						19: 'audio_files/hi.wav',
+						20: 'audio_files/nice to meet you.wav',
+						21: "audio_files/you're welcome.wav",
+						22: 'audio_files/how are you.wav',
+						23: 'audio_files/week.wav',
+						24: 'audio_files/year.wav',
+						25: 'audio_files/yesterday.wav',
+						26: 'audio_files/tomorrow.wav',
+						27: 'audio_files/can.wav',
+						28: 'audio_files/use.wav',
+						29: 'audio_files/do.wav',
+						30: 'audio_files/far.wav',
+						31: 'audio_files/small.wav',
+						32: 'audio_files/good.wav',
+						33: 'audio_files/beautiful.wav',
+						34: 'audio_files/ugly.wav',
+						35: 'audio_files/difficult.wav',
+						36: 'audio_files/bad.wav',
+						37: 'audio_files/near.wav',
+						38: 'audio_files/beer.wav',
+						39: 'audio_files/wine.wav',
+						40: 'audio_files/chicken.wav',
+						41: 'audio_files/fish.wav',
+						42: 'audio_files/cook.wav',
+						43: 'audio_files/engineer.wav',
+						44: 'audio_files/doctor.wav',
+						45: 'audio_files/nurse.wav',
+						46: 'audio_files/teacher.wav',
+						47: 'audio_files/programmer.wav',
+						48: 'audio_files/salesman.wav',
+						49: 'audio_files/good morning.wav',
+						50: 'audio_files/good afternoon.wav',
+						51: 'audio_files/good evening.wav',
+						52: 'audio_files/good night.wav',
 						53: 'audio_files/delicious.wav'})
 	
 	
