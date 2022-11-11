@@ -47,6 +47,11 @@ names = ['christiaan.csv', 'fanny.csv', 'hilbert.csv', 'joep.csv', 'Matthijs.csv
 # print(data)
 
 for name in range(len(names)):
+    print("-----------------------------")
+    print("New person\n")
+    print("\n")
+    print("\n")
+    print("\n")
     print(names[name])
 
     data = pd.read_csv(os.path.join(directory, names[name]))
@@ -112,8 +117,16 @@ for name in range(len(names)):
         max_facts_seen_visual.append(data["fact_id"].max())
 
 
+    #print current start time
+    print("Start time: " + str(data["start_time"].iloc[0]))
+
+    # reduce the start time with the first start time
+    data["start_time"] = data["start_time"] - data["start_time"].iloc[0]
+    print(data)
+
+
     # Check how many prompts of certain type appeared after 5 minutes and how many the user got correct
-    after5min = data[data.start_time > 300000]
+    after5min = data[data.start_time >= 300000]
     # after5min = (after5min["correct"].ne("False")
     #              .groupby(after5min["audio_or_visual_fact"])
     #              .value_counts()
@@ -123,7 +136,14 @@ for name in range(len(names)):
     #              .reindex(columns=["Total","Correct","Wrong"]))
     # print(after5min)
 
+
     s = after5min.groupby("audio_or_visual_fact")["correct"].value_counts()
+    print(s)
+
+    sa = after5min.groupby("audio_or_visual_fact")["correct"].value_counts().Audio
+    sv = after5min.groupby("audio_or_visual_fact")["correct"].value_counts().Visual
+
+
     # print("S:")
     # print(s)
     # # print("........\n")
@@ -138,17 +158,26 @@ for name in range(len(names)):
     # wrong_audio_5min = after5min["wrong_audio_visual"]
     # correct_visual_5min = after5min["correct_visual"]
     # wrong_visual_5min = after5min["wrong_visual"]
-    if audio_learner:
-        audiofact_correct_audiolearner_5min.append(s[0])
-        visualfact_correct_audiolearner_5min.append(s[2])
-        audiofact_wrong_audiolearner_5min.append(s[1])
-        visualfact_wrong_audiolearner_5min.append(s[3])
-    else:
-        audiofact_correct_visuallearner_5min.append(s[0])
-        visualfact_correct_visuallearner_5min.append(s[2])
-        audiofact_wrong_visuallearner_5min.append(s[1])
-        visualfact_wrong_visuallearner_5min.append(s[3])
 
+
+    if audio_learner:
+        audiofact_correct_audiolearner_5min.append(sa[True])
+        visualfact_correct_audiolearner_5min.append(sv[True])
+        if names[name] == 'fanny.csv':
+            print("Audio")
+            audiofact_wrong_audiolearner_5min.append(0)
+        else:
+            audiofact_wrong_audiolearner_5min.append(sa[False])
+        visualfact_wrong_audiolearner_5min.append(sv[False])
+    else:
+        audiofact_correct_visuallearner_5min.append(sa[True])
+        visualfact_correct_visuallearner_5min.append(sv[True])
+        if names[name] == 'fanny.csv':
+            print("Yes")
+            audiofact_wrong_visuallearner_5min.append(0)
+        else:
+            audiofact_wrong_visuallearner_5min.append(sa[False])
+        visualfact_wrong_visuallearner_5min.append(sv[False])
 
 
     # # Plot shit
@@ -207,12 +236,15 @@ print("Avg visual facts learned audiovisual learners: " + str(average(audiovisua
 print("Avg audiovisual facts learned audiovisual learners: " + str(average(audiovisual_learned_audiovisual)))
 print("Avg unique facts seen by visual learners: " + str(average(max_facts_seen_visual)))
 print("Avg unique facts seen by audiovisual learners: " + str(average(max_facts_seen_audiovisual)))
+
+
 print("Avg facts presented as visual to visual learners: " + str(average(visual_facts_seen_visuallearners)))
 print("Avg facts presented as audiovisual to visual learners: " + str(average(audiovisual_facts_seen_visuallearners)))
 print("Avg facts presented as visual to audiovisual learners: " + str(average(visual_facts_seen_audiovisuallearners)))
 print("Avg facts presented as audiovisual to audiovisual learners: " + str(average(audiovisual_facts_seen_audiovisuallearners)))
 
 print("\nFinal data:\n")
+
 
 # audio learners
 print("After 5 minutes, audio learners had on average " + str(average(audiofact_correct_audiolearner_5min)) + " audio prompts correct and " + str(average(audiofact_wrong_audiolearner_5min)) + " wrong.")
